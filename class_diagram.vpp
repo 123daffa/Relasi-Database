@@ -1,0 +1,153 @@
+@startuml
+' E-Learning Platform - Class Diagram
+
+abstract class User {
+  +Long id
+  +String name
+  +String email
+  +String passwordHash
+  +Date createdAt
+  +login()
+  +logout()
+}
+
+class Student {
+  +String studentId
+  +enrollCourse(Course)
+  +submitAssignment(Submission)
+}
+
+class Instructor {
+  +String instructorId
+  +createCourse(Course)
+  +gradeSubmission(Submission)
+}
+
+class Admin {
+  +String adminId
+  +manageUser(User)
+}
+
+class Course {
+  +Long id
+  +String title
+  +String description
+  +List<Module> modules
+  +List<Enrollment> enrollments
+  +addModule(Module)
+}
+
+class Module {
+  +Long id
+  +String title
+  +List<Lesson> lessons
+  +orderIndex: int
+  +addLesson(Lesson)
+}
+
+class Lesson {
+  +Long id
+  +String title
+  +String content
+  +List<Resource> resources
+  +durationMinutes: int
+}
+
+class Resource {
+  +Long id
+  +String type
+  +String url
+  +String title
+}
+
+class Enrollment {
+  +Long id
+  +Date enrolledAt
+  +String status
+  +float progressPercent
+}
+
+class Assignment {
+  +Long id
+  +String title
+  +String description
+  +Date dueDate
+  +int maxScore
+  +List<Submission> submissions
+}
+
+class Submission {
+  +Long id
+  +Student student
+  +Assignment assignment
+  +Date submittedAt
+  +String contentUrl
+  +Integer score
+  +String feedback
+}
+
+class Grade {
+  +Long id
+  +Submission submission
+  +Instructor gradedBy
+  +Integer score
+  +String remarks
+  +Date gradedAt
+}
+
+class Discussion {
+  +Long id
+  +String title
+  +List<Post> posts
+  +open()
+  +close()
+}
+
+class Post {
+  +Long id
+  +User author
+  +String content
+  +Date postedAt
+  +List<Post> replies
+}
+
+class Notification {
+  +Long id
+  +User recipient
+  +String message
+  +Date sentAt
+  +Boolean read
+}
+
+class Certificate {
+  +Long id
+  +Student student
+  +Course course
+  +Date issuedAt
+  +String certificateUrl
+}
+
+User <|-- Student
+User <|-- Instructor
+User <|-- Admin
+
+Instructor "1" o-- "0..*" Course : teaches
+Course "1" o-- "0..*" Module : contains
+Module "1" o-- "0..*" Lesson : contains
+Lesson "1" o-- "0..*" Resource : attaches
+Course "1" o-- "0..*" Enrollment : has
+Student "0..*" -- "0..*" Course : via Enrollment
+Course "1" o-- "0..*" Assignment : includes
+Assignment "1" o-- "0..*" Submission : receives
+Submission "0..1" -- "0..1" Grade : gradedBy
+Instructor "0..*" -- "0..*" Grade : gives
+Course "1" o-- "0..*" Discussion : has
+Discussion "1" o-- "0..*" Post : contains
+Post "1" o-- "0..*" Post : replies
+User "1" o-- "0..*" Notification : receives
+Student "0..*" -- "0..*" Certificate : awarded
+
+Enrollment "1" *-- "1" Student
+Enrollment "1" *-- "1" Course
+
+@enduml
